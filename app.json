@@ -15,9 +15,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.2023SW.hunchgame"
     },
     "android": {
+      "package": "com.2023SW.hunchgame",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -27,4 +29,5 @@
       "favicon": "./assets/favicon.png"
     }
   }
+
 }
