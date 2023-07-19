@@ -9,4 +9,4 @@ const map = () => {
   );
 };
 
-export default Screen1;
+export default map;
