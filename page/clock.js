@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-const clock = () => {
+const Clock = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>clock</Text>
@@ -9,4 +9,4 @@ const clock = () => {
   );
 };
 
-export default clock;
+export default Clock;

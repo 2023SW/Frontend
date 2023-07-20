@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text} from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput} from 'react-native';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import BottomTabNavigator from './BottomTabNavigator';
+
 
 
 const MyApp = () => {
