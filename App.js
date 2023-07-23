@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
       ios: {
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3, // 그림자의 투명도를 조정
+        shadowOpacity: 0.2, // 그림자의 투명도를 조정
         shadowRadius: 4,
       },
       android: {
