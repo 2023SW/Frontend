@@ -8,7 +8,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 
 WebBrowser.maybeCompleteAuthSession();
-// web: 745655240240-9if2m6beejitoj7bue5smqte2hdbhghs.apps.googleusercontent.com
+// web:745655240240-9if2m6beejitoj7bue5smqte2hdbhghs.apps.googleusercontent.com
 // IOS: 745655240240-b8lhqnq4r4nf49ja96a6mmtsknlu6fhr.apps.googleusercontent.com
 // android: 745655240240-msgrihanskoamjbes1vnf85i1rf3h9l1.apps.googleusercontent.com
 export default function App() {
