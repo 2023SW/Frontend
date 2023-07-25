@@ -32,16 +32,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center', // 가로 정렬을 위해 추가
     backgroundColor: '#fff',
-    borderRadius: 15,
+    borderRadius: 30,
     padding: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 5,
-    marginTop: 60, // 여기에 marginTop을 추가하여 검색 바를 상단으로 이동
+    marginTop: 30, // 여기에 marginTop을 추가하여 검색 바를 상단으로 이동
     marginLeft: 10,
     marginRight:10,
+    marginBottom: 20,
   },
   input: {
     flex: 1,

@@ -48,8 +48,6 @@ export default function App() {
 
     return (
         <View style={styles.container}>
-                {/* <Text style={styles.title1}>눈치</Text>
-                <Text style={styles.title2}>게임</Text> */}
                 <TouchableOpacity activeOpacity={0.7} style={styles.shadowContainer}>
                     <View style={styles.rectangle}>
                         <View style={styles.textLine}>
