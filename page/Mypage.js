@@ -16,8 +16,8 @@ const MyPageScreen = () => {
   }, []);
   // 가정: 사용자 정보
   const userInfo = {
-    name: 'Nicole',
-    email: 'jiwoo0022@naver.com',
+    name: 'Sujung',
+    email: '20212023@sungshin.ac.kr',
     profileIconName: 'person-circle-outline', // Ionicons 아이콘 이름
   };
    // 가정: 현재 나의 위치와 혼잡도 정보
@@ -50,7 +50,7 @@ const MyPageScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.profileContainer}>
-          <Icon name={userInfo.profileIconName} size={80} color="#ccc" />
+          <Icon name={userInfo.profileIconName} size={75} color="#ccc" />
         </View>
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{userInfo.name}</Text>

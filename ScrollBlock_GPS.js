@@ -1,23 +1,15 @@
-import React, { useRef, useState  } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  PanResponder,
-  Animated,
-  FlatList
-} from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, PanResponder, Animated, FlatList, TextInput, Text,LogBox } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 import ShowMap from './ShowMap';
-
+import Modal from 'react-native-modal';
 
 const Stack = createStackNavigator();
-
 
 const App_GPS = () => {
   return (
@@ -31,6 +23,27 @@ const App_GPS = () => {
 };
 
 const ScrollBlock_GPS = ({ searchBarStyle }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+
+  const mapViewRef = useRef(null); // Add this line to create the mapViewRef
+
+
+  useEffect(() => {
+    if (userLocation) {
+      // 사용자 위치가 변경되면 지도의 region을 업데이트
+      mapViewRef.current.animateToRegion(
+        {
+          latitude: userLocation.latitude,
+          longitude: userLocation.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        },
+        1000 // 애니메이션 지속 시간 (ms)
+      );
+    }
+  }, [userLocation]);
+  
   const pan = useRef(new Animated.Value(0)).current;
   const scrollBlockHeight = 50; // 원하는 스크롤 블록의 최소 높이로 변경
   const contentHeight = 300; // 스크롤 블록의 내용 높이
@@ -42,69 +55,115 @@ const ScrollBlock_GPS = ({ searchBarStyle }) => {
   
   // 가상의 '핫플' 데이터 리스트
 const hotplace = [
-  { id: '1', title: '핫플1', order:'1.', state: '상태1' },
-  { id: '2', title: '핫플2', order:'2.', state: '상태2' },
-  { id: '3', title: '핫플3', order:'3.', state: '상태3' },
+  { id: '1', title: '강남', order: '1.', state: '(매우 혼잡)' },
+  { id: '2', title: '홍대', order: '2.',state: '(매우 혼잡)' },
+  { id: '3', title: '종로', order: '3.',state: '(혼잡)' },
   // ... 더 많은 항목 추가 가능
 ];
 
 // 가상의 '한산' 데이터 리스트
 const coldplace = [
-  { id: '1', title: '한산1', order:'1.', state: '상태1' },
-  { id: '2', title: '한산2', order:'2.', state: '상태2' },
-  { id: '3', title: '한산3', order:'3.', state: '상태3' },
+  { id: '1', title: '미아', order: '1.',state: '(매우 한산)' },
+  { id: '2', title: '한남', order: '2.',state: '(한산)' },
+  { id: '3', title: '이촌', order: '3.',state: '(한산)' },
   // ... 더 많은 항목 추가 가능
 ];
 
-  // Function to handle list item press
-  // const handleListItemPress = (item) => {
-  //   // Navigate to the ShowMap and pass the selected item as a parameter
-  //   navigation.navigate('ShowMap', { title: item.title, state: item.state });
-  // };
-  
+const handleListItemPress = (item) => {
+  navigation.navigate('ShowMap', { title: item.title, state: item.state });
+};
 
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (e, gestureState) => {
-      if (gestureState.dy < 0) {
-        // 스크롤 블록이 아래로 움직이거나 최대 스크롤 높이까지만 허용
-        pan.setValue(gestureState.dy < -maxScroll ? -maxScroll : gestureState.dy);
-      }
-    },
-    onPanResponderRelease: (e, gestureState) => {
-      if (gestureState.dy > 0) {
-        // 스크롤 블록이 아래로 움직였을 때, 원래 위치로 복귀
-        Animated.spring(pan, { toValue: 0, useNativeDriver: false }).start();
-      } else if (gestureState.dy < -maxScroll) {
-        // 스크롤 블록이 검색바 아래로 움직였을 때, 검색바 아래에서 멈추도록 설정
-        Animated.spring(pan, { toValue: -maxScroll, useNativeDriver: false }).start();
-      }
-    },
-  });
+const panResponder = PanResponder.create({
+  onStartShouldSetPanResponder: () => true,
+  onPanResponderMove: (e, gestureState) => {
+    if (gestureState.dy < 0) {
+      pan.setValue(gestureState.dy < -maxScroll ? -maxScroll : gestureState.dy);
+    }
+  },
+  onPanResponderRelease: (e, gestureState) => {
+    if (gestureState.dy > 0) {
+      Animated.spring(pan, { toValue: 0, useNativeDriver: false }).start();
+    } else if (gestureState.dy < -maxScroll) {
+      Animated.spring(pan, { toValue: -maxScroll, useNativeDriver: false }).start();
+    }
+  },
+});
 
-  
-  
-  const titleStyle = {
-    
-    marginBottom: 10, // 제목과 리스트들 사이의 간격을 10으로 조정
-  };
+const titleStyle = {
+  marginBottom: 10,
+};
 
-  // 블록 높이 동적 조절
-  const height = pan.interpolate({
-    inputRange: [-maxScroll, 0],
-    outputRange: [scrollBlockHeight + maxScroll+150, scrollBlockHeight],
-    extrapolate: 'clamp',
-  });
+const height = pan.interpolate({
+  inputRange: [-maxScroll, 0],
+  outputRange: [scrollBlockHeight + maxScroll + 150, scrollBlockHeight],
+  extrapolate: 'clamp',
+});
+const handleGPSIconPress = async () => {
+  setIsModalVisible(false);
 
-  return (
-    <View style={[styles.scrollBlockContainer, searchBarStyle]}>
-      <View style={styles.gpsIconContainer}>
-        <View style={styles.iconInnerCircle}>
-          <TouchableOpacity onPress={() => console.log('GPS 아이콘 클릭됨')}>
-            <Ionicons name="locate" size={32} color="black" />
+  let { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('위치 접근 권한이 거부되었습니다');
+    return;
+  }
+
+  let location = await Location.getCurrentPositionAsync({});
+  setUserLocation(location.coords);
+  // 사용자의 위치를 로그로 출력
+  console.log('사용자의 위치 - 위도:', location.coords.latitude);
+  console.log('사용자의 위치 - 경도:', location.coords.longitude);
+};
+
+
+return (
+  <View style={[styles.scrollBlockContainer, searchBarStyle]}>
+    <View style={styles.gpsIconContainer}>
+      <View style={styles.iconInnerCircle}>
+        <TouchableOpacity onPress={handleGPSIconPress}>
+          <Ionicons name="locate" size={32} color="black" />
+        </TouchableOpacity>
+      </View>
+    </View>
+
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <Text>Enter GPS Coordinate:</Text>
+          <TextInput
+            style={styles.gpsInput}
+            placeholder="Latitude"
+            keyboardType="numeric"
+            onChangeText={(text) => setGpsCoordinate({ ...gpsCoordinate, latitude: parseFloat(text) })}
+          />
+          <TextInput
+            style={styles.gpsInput}
+            placeholder="Longitude"
+            keyboardType="numeric"
+            onChangeText={(text) => setGpsCoordinate({ ...gpsCoordinate, longitude: parseFloat(text) })}
+          />
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              setUserLocation(gpsCoordinate);
+              setIsModalVisible(false);
+            }}
+          >
+            <Text style={styles.modalButtonText}>Submit</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Modal>
+
+      <MapView
+      ref={mapViewRef}
+      style={{ flex: 1, width: '100%', height: '100%' }}
+        region={{
+          latitude: userLocation ? userLocation.latitude : 0,
+          longitude: userLocation ? userLocation.longitude : 0,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      >
+        {userLocation && <Marker coordinate={userLocation} />}
+      </MapView>
 
       <Animated.View {...panResponder.panHandlers} style={[styles.scrollBlock, { height, marginTop }]}>
       
@@ -113,31 +172,31 @@ const coldplace = [
           <Text style={[styles.sectionTitleHotPlace, titleStyle]}>핫플</Text>
     
           <FlatList
-            data={hotplace}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate("ShowMap", { title: item.title, state: item.state})}> 
-                <View style={styles.listItem}>
-                  <Text>{item.order} {item.title}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-          />
+          data={hotplace}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => navigation.navigate("ShowMap", { title: item.title, state: item.state })}>
+              <View style={styles.listItem}>
+                <Text style={{ fontSize: 19, fontWeight: 'bold', color: 'rgba(0, 0, 0, 0.7)' }}>{item.order} {item.title} {item.state}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+        />
         </View>
         <View style={[styles.listBlock, { backgroundColor: 'white', borderColor: 'lightgray' }]}>
           <Text style={[styles.sectionTitleColdPlace, titleStyle]}>한산</Text>
          
           <FlatList
-            data={coldplace}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => navigation.navigate("ShowMap", { title: item.title, state: item.state})}>
-                <View style={styles.listItem}>
-                  <Text>{item.order} {item.title}</Text>
-                </View>
-              </TouchableOpacity>
-            )}
-            keyExtractor={(item) => item.id}
-          />
+          data={coldplace}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => navigation.navigate("ShowMap", { title: item.title, state: item.state })}>
+              <View style={styles.listItem}>
+              <Text style={{ fontSize: 19, fontWeight: 'bold', color: 'rgba(0, 0, 0, 0.7)' }}>{item.order} {item.title} {item.state}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+        />
         </View>
       </Animated.View>
     </View>
@@ -184,13 +243,13 @@ const styles = StyleSheet.create({
     sectionTitleHotPlace: {
         fontSize: 40,
         fontWeight: 'bold',
-        color: 'red', 
+        color: '#FF5555', 
     },
 
     sectionTitleColdPlace: {
         fontSize: 40,
         fontWeight: 'bold',
-        color: 'blue', 
+        color: '#0044BB', 
     },
     
     listItem: {
@@ -232,4 +291,4 @@ const styles = StyleSheet.create({
     
    
   });
-export default ScrollBlock_GPS;
+  export default ScrollBlock_GPS;

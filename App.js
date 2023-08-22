@@ -1,38 +1,50 @@
+import React, { useState, useEffect } from 'react';
+import Login from './Login';
+import BottomTabNavigator from './BottomTabNavigator'; // BottomTabNavigator 파일 경로에 맞게 수정
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, ScrollView, TextInput} from 'react-native';
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import Login from './Login';
-import Starpage from './page/Starpage';
-import SearchBar from './SearchBar';
+import Map from './MapPage';
 import ShowMap from './ShowMap';
-import BottomTabNavigator from './BottomTabNavigator';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+
 
 const MyApp = () => {
-  const route={
-    params:{
-      title: 'ㅇㅇ동', state: '상태',
-    }
-  }
+  const [showLogin, setShowLogin] = useState(true);
+
+  useEffect(() => {
+    // 3초 후에 로그인 화면을 감추고 탐색을 변경
+    const timer = setTimeout(() => {
+      setShowLogin(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <NavigationContainer independent={true}>
+    <View style={styles.container}>
+      {showLogin ? (
+        <Login />
+      ) : (
+        <View style={styles.container}>
+      <StatusBar style="auto" />
+      <BottomTabNavigator />
+           
+    </View>
 
-    <Stack.Navigator>
-        <Stack.Screen name="BottomTabNavigation" component={BottomTabNavigator} options={{ headerShown: false }} />
-        <Stack.Screen name="Starpage" component={Starpage} options={{ title: '장소 상세 정보' }} />
-        <Stack.Screen name="ShowMap" component={ShowMap} options={{ title: '지도 보기' }} />
-      </Stack.Navigator>
-
-
-    </NavigationContainer>
-    
+      )}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+   
+  },
+});
 
 export default MyApp;

@@ -29,8 +29,8 @@ const ShowMap = ({ route }) => {
     const maxRadius = 0.05;
 
 
-    const centerLatitude = 37.56628519;
-    const centerLongitude = 126.9909759;
+    const centerLatitude = 37.52966812;
+    const centerLongitude = 126.9645126;
 
     useEffect(() => {
         // 백엔드 API로부터 혼잡도 데이터를 가져옴
@@ -64,11 +64,7 @@ const ShowMap = ({ route }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.textContainer}>
-            <Text style={styles.title}>
-                <Text>{title}</Text>
-                <Text style={{ color: 'gray' }}>의 혼잡도              </Text>
-                <Text style={{ color: '#0044BB' }}>{state}</Text>
-            </Text>
+                <Text style={styles.title}>{title}의 혼잡도              {state}</Text>
                 {/* <Text style={styles.info}>{title}    {state}</Text> */}
             </View>
             <View style={styles.mapContainer}>
